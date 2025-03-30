@@ -1,1 +1,1 @@
-import duckdb 
+import duckdb
