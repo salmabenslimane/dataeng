@@ -21,7 +21,7 @@ def create_raw_schema():
         conn.excecute("""
             CREATE TABLE IF NOT EXISTS raw.orders (
              
-                      'schema'
+                      Table of mockaroo data
         """)
 
 # Run the function to create the 'raw' schema
