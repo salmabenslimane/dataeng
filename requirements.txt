@@ -1,2 +1,2 @@
-requests 
-duckdb
+requests #FOR API CALLS
+duckdb # lightweight local database to store and query raw data pulled from an API.
