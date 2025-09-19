@@ -61,7 +61,6 @@ mini_data_pipeline/
 
 Booking_ID	
 Booking_Date
-Flight_ID	
 Flight_Date
 Passenger_ID	
 Passenger_Name	
@@ -71,7 +70,5 @@ Country_Code
 Ticket_Class	
 Quantity	
 Unit_Price	
-Payment_Method	
-Booking_Status	
 Revenue
 
