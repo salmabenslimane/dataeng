@@ -1,27 +1,4 @@
-📂 Overview 
-API → DuckDB → Airflow → Streamlit
-
-Programming Language: Python
-Data Sources: Mock API (Mockaroo)
-Storage: DuckDB
-Orchestration: Airflow (Airflow DAG runs your CLI tools (init-db.py, fetch-data.py) on a schedule → updates DuckDB)
-
-
-📂 DB Folder Structure 
-
-init\db/
-├── raw_data.duckdb         ← The actual DuckDB database file
-├── init_schema.py          ← Script to define your schema (raw.orders, raw.users, etc.)
-├── fetch_and_insert.py     ← Script to fetch from API and insert into DuckDB
-└── config.json             ← Store API URLs, keys, etc.
-
-
-📂 Iterations: 
-
-Iteration 1: Create all the functional code 
-Iteration 2: Turn following files into CLI tools (init-db.py and fetch-data.py)
-
-
+ 📂 Overview 
 
 | Mini-project (Mockaroo)            | Air France real use case                              |
 | ---------------------------------- | ----------------------------------------------------- |
@@ -34,9 +11,46 @@ Iteration 2: Turn following files into CLI tools (init-db.py and fetch-data.py)
 
 | Raw schema stays the same          | Raw tables always have same structure                 |
 
+----------------------------------------------------------------------------------------------
+
+* Programming Language: Python
+* Data Sources: Mock API (Mockaroo)
+* Storage: DuckDB
+* Orchestration: Airflow (Airflow DAG runs your CLI tools (init-db.py, fetch-data.py) on a schedule → updates DuckDB)
+* Stream : API → DuckDB → Airflow → Streamlit
+
+📂 Iterations: 
+
+Iteration 1: Create all the functional code 
+Iteration 2: Turn following files into CLI tools (init-db.py and fetch-data.py)
 
 
-🔹 Features : 
+📂 DB Folder Structure 
+
+mini_data_pipeline/
+├── db/
+│   ├── raw_data.duckdb           # Your DuckDB database file
+│   ├── init_schema.py            # Create schemas & tables
+│   ├── fetch_and_insert.py       # Fetch data from API & insert
+│   └── db_connection.py          # Helper to connect to DuckDB
+│
+├── dags/
+│   └── etl_pipeline.py           # Airflow DAG orchestrating ETL
+│
+├── config/
+│   └── config.json               # API URLs, keys, etc.
+│
+├── cli_tools/
+│   ├── init-db.py                # CLI wrapper for init_schema.py
+│   └── fetch-data.py             # CLI wrapper for fetch_and_insert.py
+│
+├── dashboard/
+│   └── app.py                    # Streamlit dashboard
+│
+├── requirements.txt              # All Python dependencies
+└── README.md                     # Project description & instructions
+
+📂 Features of API data: 
 
 Booking_ID	
 Booking_Date
