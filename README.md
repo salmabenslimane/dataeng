@@ -36,7 +36,21 @@ Iteration 2: Turn following files into CLI tools (init-db.py and fetch-data.py)
 
 
 
-🔹 Example row
-Booking_ID	Booking_Date	Flight_ID	Flight_Date	Passenger_ID	Passenger_Name	Email	Gender  Country_Code	Ticket_Class	Quantity	Unit_Price	Payment_Method	Booking_Status	Revenue
+🔹 Features : 
 
-BKG001	2025-09-18 14:23	AF123	2025-09-25 08:45	PAX001	Alice Dupont	alice.dupont@example.com    Female	FR	Economy	1	120	Credit Card	Confirmed	120
+Booking_ID	
+Booking_Date
+Flight_ID	
+Flight_Date
+Passenger_ID	
+Passenger_Name	
+Email	
+Gender  
+Country_Code	
+Ticket_Class	
+Quantity	
+Unit_Price	
+Payment_Method	
+Booking_Status	
+Revenue
+
