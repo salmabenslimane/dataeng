@@ -50,6 +50,13 @@ mini_data_pipeline/
 ├── requirements.txt              # All Python dependencies
 └── README.md                     # Project description & instructions
 
+✅ Summary of workflow in code:
+
+* init-db.py → init_schema.py → create tables in DuckDB.
+* fetch-data.py → fetch_and_insert.py → fetch mock flight bookings → insert into DuckDB.
+* Airflow DAG → schedules init-db and fetch-data daily.
+* dashboard/app.py → lets users explore data, filter by date, and visualize KPIs.
+
 📂 Features of API data: 
 
 Booking_ID	
