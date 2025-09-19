@@ -3,7 +3,7 @@
 Programming Language: Python
 Data Sources: Mock API (Mockaroo)
 Storage: DuckDB
-Orchestration: Airflow
+Orchestration: Airflow (Airflow DAG runs your CLI tools (init-db.py, fetch-data.py) on a schedule → updates DuckDB)
 
 
 📂 DB Folder Structure 

@@ -13,7 +13,7 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # API endpoint and key
-url = "https://my.api.mockaroo.com/sales"
+url = "https://my.api.mockaroo.com/sales?key=e5432ea0"
 headers = {"X-API-Key": "e5432ea0"}
 
 # Fetch data from API
