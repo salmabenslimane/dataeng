@@ -23,6 +23,7 @@
 
 Iteration 1: Create all the functional code 
 Iteration 2: Turn following files into CLI tools (init-db.py and fetch-data.py)
+Iteration 3:
 
 
 📂 DB Folder Structure 
