@@ -77,3 +77,7 @@ Quantity
 Unit_Price	
 Revenue
 
+📂 Reminders : 
+* Airflow = a scheduler for data pipelines.
+* Docker = a mini Linux environment inside your Windows.
+👉 “Please run this as if I were on Linux, where Airflow works perfectly.”
