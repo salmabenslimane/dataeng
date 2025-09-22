@@ -79,5 +79,12 @@ Revenue
 
 📂 Reminders : 
 * Airflow = a scheduler for data pipelines.
+
 * Docker = a mini Linux environment inside your Windows.
 👉 “Please run this as if I were on Linux, where Airflow works perfectly.”
+
+* Postgres (or another RDBMS) is used by Airflow to store its metadata (DAG definitions, DAG run records, task instances etc)
+
+* DuckDB is a file-based analytical database optimized for fast OLAP queries (single file, great for analytics). It is not designed to be a multi-process transactional metadata store for a scheduler system. 
+
+* The YAML defines two containers: postgres (Airflow metadata DB) and airflow (Airflow process).
