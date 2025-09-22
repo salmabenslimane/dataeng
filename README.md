@@ -34,9 +34,13 @@ mini_data_pipeline/
 │   ├── init_schema.py            # Create schemas & tables
 │   ├── fetch_and_insert.py       # Fetch data from API & insert
 │   └── db_connection.py          # Helper to connect to DuckDB
-│
-├── dags/
-│   └── etl_pipeline.py           # Airflow DAG orchestrating ETL
+|
+│airflow/
+├── dags/                # your Airflow DAGs
+│   └── etl_pipeline.py
+├── logs/                # airflow logs
+├── plugins/             # custom operators (optional)
+└── docker-compose.yaml  # airflow setup
 │
 ├── config/
 │   └── config.json               # API URLs, keys, etc.
