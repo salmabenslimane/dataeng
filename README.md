@@ -88,3 +88,6 @@ Revenue
 * DuckDB is a file-based analytical database optimized for fast OLAP queries (single file, great for analytics). It is not designed to be a multi-process transactional metadata store for a scheduler system. 
 
 * The YAML defines two containers: postgres (Airflow metadata DB) and airflow (Airflow process).
+--> service = container
+
+* Docker compose = Orchestration for Docker 
