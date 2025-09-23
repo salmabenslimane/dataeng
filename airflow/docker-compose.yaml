@@ -50,7 +50,8 @@ services:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-    command: airflow api-server
+    command: airflow webserver
+
 
 
   airflow-scheduler:
