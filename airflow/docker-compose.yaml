@@ -27,11 +27,13 @@ services:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-      - ./wait-for-db.sh:/wait-for-db.sh
       # These lines mean: “Sync my local folders for DAGs, logs, and plugins with the container’s Airflow folders, so I can keep files persistent and editable on my host machine.”
-    entrypoint: ["/wait-for-db.sh"]
-    command: ["airflow", "db", "migrate"] # this command runs inside the service when the service is started
-    restart: always
+    entrypoint: /bin/bash
+    command: # this command runs inside the service when the service is started
+      - -c
+      - |
+        airflow db migrate  
+
   airflow-webserver: 
     image: apache/airflow:3.0.6
     depends_on:
@@ -48,10 +50,10 @@ services:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-      - ./wait-for-db.sh:/wait-for-db.sh
-    entrypoint: ["/wait-for-db.sh"]
-    command: ["airflow", "webserver"] # start the classic Airflow UI
-    restart: always
+    command: airflow webserver
+
+
+
   airflow-scheduler:
     image: apache/airflow:3.0.6
     depends_on:
@@ -65,7 +67,5 @@ services:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-      - ./wait-for-db.sh:/wait-for-db.sh
-    entrypoint: ["/wait-for-db.sh"]
-    command: ["airflow", "scheduler"] # continuously triggers tasks according to schedule
-    restart: always
+    command: airflow scheduler
+  
