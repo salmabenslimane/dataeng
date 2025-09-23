@@ -91,3 +91,12 @@ Revenue
 --> service = container
 
 * Docker compose = Orchestration for Docker 
+
+
+
+
+
+
+test dags : 
+docker compose run --rm airflow-scheduler airflow dags list
+docker compose run --rm airflow-scheduler airflow tasks test etl_pipeline fetch_data 2025-09-23

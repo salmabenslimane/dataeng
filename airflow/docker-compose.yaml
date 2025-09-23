@@ -1,8 +1,3 @@
-# Write from scratch or just curl for all the services you need (Postgres, Airflow webserver, scheduler, worker, triggerer, init).
-# Our own minimal docker-compose.yaml: Postgres service (custom), Airflow service(s) (custom command, split into init/webserver/scheduler)
-
-# Run airflow-init alone first to set up DB, then the rest, the services usually don't wait for airflow db migrate to finish, so you might get connection errors if you start everything at once.
-
 services:
   postgres:
     image: postgres:15
@@ -13,28 +8,23 @@ services:
     ports:
       - "5432:5432"
 
-  airflow-init:   # Without it, Airflow doesn’t know where to store: which DAGs exist, 
-                  # which tasks succeeded/failed, Schedules, logs, connections
+  airflow-init:   # Initializes Airflow metadata DB
     image: apache/airflow:3.0.6
     depends_on:
       - postgres
     environment:
-      AIRFLOW__CORE__LOAD_EXAMPLES: "false" # You’ll only see your own DAGs (cleaner workspace).
-      AIRFLOW__CORE__EXECUTOR: "LocalExecutor" # tasks in parallel (default is SequentialExecutor, which runs one task at a time)
-                                              # Example: fetching data from API and cleaning old logs could happen in parallel.
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow # Airflow metadata DB connection string
-    volumes: # Mount local directories to container directories for DAGs, logs, plugins (persistent storage) 
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"  
+      AIRFLOW__CORE__EXECUTOR: "LocalExecutor"  
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-      # These lines mean: “Sync my local folders for DAGs, logs, and plugins with the container’s Airflow folders, so I can keep files persistent and editable on my host machine.”
-    entrypoint: /bin/bash
-    command: # this command runs inside the service when the service is started
-      - -c
-      - |
-        airflow db migrate  
+      - ./wait-for-db.sh:/wait-for-db.sh
+    entrypoint: ["/wait-for-db.sh"]
+    command: ["airflow", "db", "migrate"]
 
-  airflow-webserver: 
+  airflow-webserver:
     image: apache/airflow:3.0.6
     depends_on:
       - airflow-init
@@ -43,16 +33,16 @@ services:
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__CORE__EXECUTOR: "LocalExecutor"
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-      AIRFLOW__API__WORKERS: "4" # Number of API workers (default is 4)
+      AIRFLOW__API__WORKERS: "4"
     ports:
-      - "8080:8080" # Airflow webserver UI
+      - "0.0.0.0:8080:8080"  # Bind to all interfaces for Windows
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-    command: airflow webserver
-
-
+      - ./wait-for-db.sh:/wait-for-db.sh
+    entrypoint: ["/wait-for-db.sh"]
+    command: ["airflow", "api-server"]
 
   airflow-scheduler:
     image: apache/airflow:3.0.6
@@ -67,5 +57,6 @@ services:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-    command: airflow scheduler
-  
+      - ./wait-for-db.sh:/wait-for-db.sh
+    entrypoint: ["/wait-for-db.sh"]
+    command: ["airflow", "scheduler"]
