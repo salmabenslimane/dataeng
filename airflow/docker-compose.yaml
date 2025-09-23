@@ -1,6 +1,7 @@
 # Write from scratch or just curl for all the services you need (Postgres, Airflow webserver, scheduler, worker, triggerer, init).
 # Our own minimal docker-compose.yaml: Postgres service (custom), Airflow service(s) (custom command, split into init/webserver/scheduler)
 
+# Run airflow-init alone first to set up DB, then the rest, the services usually don't wait for airflow db migrate to finish, so you might get connection errors if you start everything at once.
 
 services:
   postgres:
@@ -42,13 +43,28 @@ services:
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__CORE__EXECUTOR: "LocalExecutor"
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-      AIRFLOW__WEBSERVER__WORKERS: 4 # Number of webserver workers (default is 4)
+      AIRFLOW__API__WORKERS: "4" # Number of API workers (default is 4)
     ports:
       - "8080:8080" # Airflow webserver UI
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-    command: webserver
+    command: airflow api-server
 
 
+  airflow-scheduler:
+    image: apache/airflow:3.0.6
+    depends_on:
+      - airflow-init
+      - postgres
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__EXECUTOR: "LocalExecutor"
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    command: airflow scheduler
+  
