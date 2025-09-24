@@ -1,4 +1,10 @@
+version: '3.8'
+
 services:
+
+  # -----------------------------
+  # PostgreSQL
+  # -----------------------------
   postgres:
     image: postgres:15
     environment:
@@ -7,56 +13,97 @@ services:
       POSTGRES_DB: airflow
     ports:
       - "5432:5432"
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    restart: always
 
-  airflow-init:   # Initializes Airflow metadata DB
+  # -----------------------------
+  # Airflow Init
+  # -----------------------------
+  airflow-init:
     image: apache/airflow:3.0.6
     depends_on:
-      - postgres
+      postgres:
+          condition: service_healthy
     environment:
-      AIRFLOW__CORE__LOAD_EXAMPLES: "false"  
-      AIRFLOW__CORE__EXECUTOR: "LocalExecutor"  
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CORE__FERNET_KEY: ''
+      _AIRFLOW_WWW_USER_CREATE: "true"
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-      - ./wait-for-db.sh:/wait-for-db.sh
-    entrypoint: ["/wait-for-db.sh"]
-    command: ["airflow", "db", "migrate"]
+      - ./config:/opt/airflow/config
+    command: airflow db migrate
+    restart: "no"
 
+  # -----------------------------
+  # Airflow Webserver
+  # -----------------------------
   airflow-webserver:
     image: apache/airflow:3.0.6
     depends_on:
-      - airflow-init
-      - postgres
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
     environment:
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
-      AIRFLOW__CORE__EXECUTOR: "LocalExecutor"
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__API__WORKERS: "4"
     ports:
-      - "0.0.0.0:8080:8080"  # Bind to all interfaces for Windows
+      - "8080:8080"
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-      - ./wait-for-db.sh:/wait-for-db.sh
-    entrypoint: ["/wait-for-db.sh"]
-    command: ["airflow", "api-server"]
+      - ./config:/opt/airflow/config
+    command: airflow webserver
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    restart: always
 
+  # -----------------------------
+  # Airflow Scheduler
+  # -----------------------------
   airflow-scheduler:
     image: apache/airflow:3.0.6
     depends_on:
-      - airflow-init
-      - postgres
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
     environment:
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
-      AIRFLOW__CORE__EXECUTOR: "LocalExecutor"
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-      - ./wait-for-db.sh:/wait-for-db.sh
-    entrypoint: ["/wait-for-db.sh"]
-    command: ["airflow", "scheduler"]
+      - ./config:/opt/airflow/config
+    command: airflow scheduler
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8793/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    restart: always
+
+volumes:
+  postgres-db-volume:
