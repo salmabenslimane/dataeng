@@ -2,7 +2,7 @@ import pandas as pd
 import requests
 from db_connection import get_connection
 
-API_URL = "https://my.api.mockaroo.com/flight_sales.json?key=your_mockaroo_key" # Replace with your Mockaroo API key
+API_URL = "https://my.api.mockaroo.com/flight_sales.json?key=e5432ea0" # Replace with your Mockaroo API key
 
 def fetch_data():
     """Fetch flight sales data from API and return as DataFrame"""
